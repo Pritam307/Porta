@@ -1,0 +1,5 @@
+04f2a7ebf3a0afe10ff115e5c8a7d0624e3ba88a88dff05d9731bc6c11e6fb5e  dist/porta-linux-arm64
+89f7ac0e8bd3a6a1e49124cca2398b270b4b38e59751274c4b5d3037119200bd  dist/porta-linux-x64
+f277a77c61a1fc01b00c7734855b62f35054d038a343754717b8789f1dbb2b35  dist/porta-macos-arm64
+bbe99b817b5f8d99f22df7688b4cac224f2a1aedfa63bcc00effbb4ca5897df8  dist/porta-macos-x64
+a5c2560aaf933ef58469002e3f74f85cc0c77a739cc80ae18dbf63cad8d41005  dist/porta-win-x64.exe
