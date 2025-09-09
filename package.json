@@ -1,0 +1,16 @@
+{
+  "name": "porta",
+  "version": "1.0.0",
+  "description": "a friendly tunneling application",
+  "bin": {
+    "porta": "./index.js"
+  },
+  "dependencies": {
+    "commander": "^11.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pritam Kundilya",
+  "license": "MIT"
+}
