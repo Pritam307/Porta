@@ -35,7 +35,7 @@ echo "📦 Extracting..."
 unzip -o "/tmp/$FILE" -d /tmp/
 
 echo "🚚 Installing to $INSTALL_DIR/$APP_NAME"
-sudo mv "/tmp/$APP_NAME"* "$INSTALL_DIR/$APP_NAME"
+sudo mv "/tmp/$APP_NAME-$OS-$ARCH" "$INSTALL_DIR/$APP_NAME"
 sudo chmod +x "$INSTALL_DIR/$APP_NAME"
 
 echo "✅ Installation complete!"
