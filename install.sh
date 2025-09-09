@@ -34,8 +34,9 @@ curl -L "$DOWNLOAD_URL" -o "/tmp/$FILE"
 echo "📦 Extracting..."
 unzip -o "/tmp/$FILE" -d /tmp/
 
+BINARY="/tmp/${APP_NAME}-${OS}-${ARCH}"
 echo "🚚 Installing to $INSTALL_DIR/$APP_NAME"
-sudo mv "/tmp/$APP_NAME-$OS-$ARCH" "$INSTALL_DIR/$APP_NAME"
+sudo mv "$BINARY" "$INSTALL_DIR/$APP_NAME"
 sudo chmod +x "$INSTALL_DIR/$APP_NAME"
 
 echo "✅ Installation complete!"
