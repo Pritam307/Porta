@@ -1,0 +1,128 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - main       # trigger on pushes to main branch
+      
+jobs:
+  build-macOS-binaries:
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install pkg
+        run: npm install -g pkg
+
+      - name: Build binary
+        run: |
+          npx pkg . --targets node18-macos-${{ matrix.arch }} --output dist/porta-macos-${{ matrix.arch }}
+
+
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install pkg
+        run: npm install -g pkg
+
+      - name: Create dist dir
+        run: mkdir -p dist
+
+      # Build binaries (example: pkg). Adjust targets as needed.
+      - name: Build linux x64
+        run: npx pkg . --targets node18-linux-x64 --output dist/porta-linux-x64
+
+      - name: Build linux arm64
+        run: npx pkg . --targets node18-linux-arm64 --output dist/porta-linux-arm64
+
+      - name: Build windows x64
+        run: npx pkg . --targets node18-win-x64 --output dist/porta-win-x64.exe
+
+      - name: Create checksums
+        run: |
+          cd dist
+          sha256sum * > checksums.txt
+          cd ..
+
+      - id: create_release
+        name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          body: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: Upload linux x64
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/porta-linux-x64
+          asset_name: porta-linux-x64
+          asset_content_type: application/octet-stream
+
+      - name: Upload linux arm64
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/porta-linux-arm64
+          asset_name: porta-linux-arm64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macos x64
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/porta-macos-x64
+          asset_name: porta-macos-x64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macos arm64
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/porta-macos-arm64
+          asset_name: porta-macos-arm64
+          asset_content_type: application/octet-stream
+
+      - name: Upload windows x64
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/porta-win-x64.exe
+          asset_name: porta-win-x64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload checksums
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/checksums.txt
+          asset_name: checksums.txt
+          asset_content_type: text/plain
+    
