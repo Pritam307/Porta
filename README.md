@@ -60,26 +60,24 @@ After installation, the `porta` binary will be stored at:
 ### Basic Syntax
 
 ```bash
-porta -s <user@host> -l <local-port> -r <remote-port>
+porta -l <local-port>
 ```
 
 ### Parameters
 
-- `-s, --server <server>`: SSH server in format `user@host` (required)
-- `-l, --local-port <port>`: Local port to expose (default: 3000)
-- `-r, --remote-port <port>`: Remote port on server (default: 9091)
+- `-l, --local-port <port>`: Local port to expose (required)
 
 ### Examples
 
 ```bash
 # Expose local port 3000 to remote port 9091
-porta -s ubuntu@155.248.255.247 -l 3000 -r 9091
+porta -l 3000
 
-# Expose local port 8080 to remote port 80
-porta -s user@example.com -l 8080 -r 80
+# Expose local port 8080 to remote port 9091
+porta -l 8080
 
-# Expose local port 5000 to default remote port 9091
-porta -s developer@myserver.com -l 5000
+# Expose local port 5000 to remote port 9091
+porta -l 5000
 ```
 
 ## 📋 What Happens When You Run Porta
@@ -89,13 +87,13 @@ When you start Porta, you'll see output like this:
 ```
 🚀 Starting tunnel...
    Local:  http://localhost:3000
-   Remote: http://155.248.255.247:9091
+   Remote: https://tunnel.joinmyprojects.dpdns.org
 ```
 
 ### What This Means
 
 - **Local URL**: Your service running on `localhost:3000` is now accessible
-- **Remote URL**: Anyone can access your local service via `http://155.248.255.247:9091`
+- **Remote URL**: Anyone can access your local service via `https://tunnel.joinmyprojects.dpdns.org`
 - **Tunnel Status**: The connection stays active until you stop it (Ctrl+C)
 
 ### Stopping the Tunnel
@@ -145,7 +143,7 @@ Make sure your remote server allows SSH port forwarding:
 
 For verbose output, you can run SSH directly:
 ```bash
-ssh -N -R 9091:localhost:3000 ubuntu@155.248.255.247 -v
+ssh -N -R 9091:localhost:3000 ubuntu@tunnel.joinmyprojects.dpdns.org -v
 ```
 
 ## 📄 License

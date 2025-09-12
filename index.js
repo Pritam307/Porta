@@ -1,32 +1,41 @@
 #!/usr/bin/env node
 const { spawn } = require("child_process");
 const { program } = require("commander");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const SSH_USER = process.env.SSH_USER;
+const HOST = process.env.HOST;
+const SERVER_PORT = process.env.SERVER_PORT;
 
 
 program
-  .requiredOption("-s, --server <server>", "SSH server (user@host)")
-  .option("-l, --local-port <port>", "Local port to expose", "3000")
-  .option("-r, --remote-port <port>", "Remote port on server", "9091")
+  .requiredOption("-l, --local-port <port>", "Local port to expose")
   .parse(process.argv);
 
 const opts = program.opts();
+
 console.log(`🚀 Starting tunnel...`);
 console.log(`   Local:  http://localhost:${opts.localPort}`);
-console.log(`   Remote: http://${opts.server.split("@")[1]}:${opts.remotePort}`);
+console.log(`   Remote: https://${HOST}`);
 
+const ssh = spawn(
+  "ssh",
+  [
+    "-N", // no command, just tunnel
+    "-R",
+    `${SERVER_PORT}:localhost:${opts.localPort}`,
+    `${SSH_USER}@${HOST}`,
+  ],
+  { stdio: "inherit" }
+);
 
-const ssh = spawn("ssh", [
-    "-N",                        // no command, just tunnel
-    "-R", `${opts.remotePort}:localhost:${opts.localPort}`,
-    opts.server
-  ], { stdio: "inherit" });
-  
-  ssh.on("exit", (code) => {
-    console.log(`❌ Tunnel closed (exit code ${code})`);
-  });
-  
-  process.on("SIGINT", () => {
-    console.log("\n🛑 Closing tunnel...");
-    ssh.kill("SIGINT");
-    process.exit();
-  });
+ssh.on("exit", (code) => {
+  console.log(`❌ Tunnel closed (exit code ${code})`);
+});
+
+process.on("SIGINT", () => {
+  console.log("\n🛑 Closing tunnel...");
+  ssh.kill("SIGINT");
+  process.exit();
+});
