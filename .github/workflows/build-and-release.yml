@@ -80,6 +80,7 @@ jobs:
           cd dist
           sha256sum * > checksums.txt
           cd ..
+
         # 🔑 Create a unique tag (example: vYYYYMMDD-HHMMSS)
       - name: Create tag
         run: |
@@ -95,52 +96,5 @@ jobs:
           tag: ${{ env.TAG }}
           name: Release ${{ env.TAG }}
           body: Automatic release from main branch
-
-      - name: Upload linux x64
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-linux-x64.zip
-          asset_name: porta-linux-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload linux arm64
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-linux-arm64.zip
-          asset_name: porta-linux-arm64.zip
-          asset_content_type: application/zip
-
-      - name: Upload macos x64
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-macos-x64.zip
-          asset_name: porta-macos-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload macos arm64
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-macos-arm64.zip
-          asset_name: porta-macos-arm64.zip
-          asset_content_type: application/zip
-
-      - name: Upload windows x64
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-win-x64.zip
-          asset_name: porta-win-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload checksums
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/checksums.txt
-          asset_name: checksums.txt
-          asset_content_type: text/plain
-    
+          artifacts: "dist/*.zip,dist/checksums.txt"
+          token: ${{ secrets.GITHUB_TOKEN }}
