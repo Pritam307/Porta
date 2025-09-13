@@ -4,9 +4,9 @@ const { program } = require("commander");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const SSH_USER = process.env.SSH_USER;
-const HOST = process.env.HOST;
-const SERVER_PORT = process.env.SERVER_PORT;
+const SSH_USER = "ubuntu";
+const HOST = "tunnel.joinmyprojects.dpdns.org";
+const SERVER_PORT = 9091;
 
 
 program
