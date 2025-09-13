@@ -2,8 +2,8 @@ name: Build & Release
 
 on:
   push:
-    branches:
-      - main       # trigger on pushes to main branch
+    tags:
+      - 'v*'      # trigger on pushes to main branch
       
 jobs:
   build-macOS-binaries:
@@ -60,6 +60,21 @@ jobs:
       - name: Build windows x64
         run: npx pkg . --targets node18-win-x64 --output dist/porta-win-x64.exe
 
+      - name: Zip linux x64
+        run: zip -j dist/porta-linux-x64.zip dist/porta-linux-x64
+
+      - name: Zip linux arm64
+        run: zip -j dist/porta-linux-arm64.zip dist/porta-linux-arm64
+
+      - name: Zip macOS x64
+        run: zip -j dist/porta-macos-x64.zip dist/porta-macos-x64
+
+      - name: Zip macOS arm64
+        run: zip -j dist/porta-macos-arm64.zip dist/porta-macos-arm64
+
+      - name: Zip windows x64
+        run: zip -j dist/porta-win-x64.zip dist/porta-win-x64.exe
+
       - name: Create checksums
         run: |
           cd dist
@@ -76,47 +91,47 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload linux x64
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-linux-x64
-          asset_name: porta-linux-x64
-          asset_content_type: application/octet-stream
+          asset_path: dist/porta-linux-x64.zip
+          asset_name: porta-linux-x64.zip
+          asset_content_type: application/zip
 
       - name: Upload linux arm64
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-linux-arm64
-          asset_name: porta-linux-arm64
-          asset_content_type: application/octet-stream
+          asset_path: dist/porta-linux-arm64.zip
+          asset_name: porta-linux-arm64.zip
+          asset_content_type: application/zip
 
       - name: Upload macos x64
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-macos-x64
-          asset_name: porta-macos-x64
-          asset_content_type: application/octet-stream
+          asset_path: dist/porta-macos-x64.zip
+          asset_name: porta-macos-x64.zip
+          asset_content_type: application/zip
 
       - name: Upload macos arm64
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-macos-arm64
-          asset_name: porta-macos-arm64
-          asset_content_type: application/octet-stream
+          asset_path: dist/porta-macos-arm64.zip
+          asset_name: porta-macos-arm64.zip
+          asset_content_type: application/zip
 
       - name: Upload windows x64
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/porta-win-x64.exe
-          asset_name: porta-win-x64.exe
-          asset_content_type: application/octet-stream
+          asset_path: dist/porta-win-x64.zip
+          asset_name: porta-win-x64.zip
+          asset_content_type: application/zip
 
       - name: Upload checksums
         uses: actions/upload-release-asset@v1
