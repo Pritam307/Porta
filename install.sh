@@ -17,24 +17,44 @@ case "$ARCH" in
 esac
 
 case "$OS" in
-    linux)   FILE="${APP_NAME}-${OS}-${ARCH}.zip" ;;
-    darwin)  FILE="${APP_NAME}-macos-${ARCH}.zip" ;;
-    msys*|mingw*|cygwin*) FILE="${APP_NAME}-win-${ARCH}.zip" ;;
+    linux)   FILE="${APP_NAME}-linux-${ARCH}.zip"; BIN_NAME="${APP_NAME}-linux-${ARCH}" ;;
+    darwin)  FILE="${APP_NAME}-macos-${ARCH}.zip"; BIN_NAME="${APP_NAME}-macos-${ARCH}" ;;
+    msys*|mingw*|cygwin*)
+        OS="windows"
+        FILE="${APP_NAME}-win-${ARCH}.zip"
+        BIN_NAME="${APP_NAME}-win-${ARCH}.exe"
+        ;;
     *) echo "❌ Unsupported OS: $OS"; exit 1 ;;
 esac
 
 # Fetch latest release tag via GitHub API
 TAG=$(curl -s https://api.github.com/repos/$REPO/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
 
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/$TAG/$FILE"
+ASSET_URL="https://github.com/$REPO/releases/download/$TAG/$FILE"
+CHECKSUM_URL="https://github.com/$REPO/releases/download/$TAG/checksums.txt"
 
-echo "⬇️  Downloading $FILE from $DOWNLOAD_URL"
-curl -L "$DOWNLOAD_URL" -o "/tmp/$FILE"
+echo "⬇️  Downloading $FILE"
+curl -L --fail "$ASSET_URL" -o "/tmp/$FILE"
+
+echo "⬇️  Downloading checksums.txt"
+curl -L --fail "$CHECKSUM_URL" -o "/tmp/checksums.txt"
+
+echo "🔐 Verifying checksum..."
+(
+    cd /tmp
+    sha256sum --ignore-missing -c checksums.txt | grep "$FILE: OK"
+)
 
 echo "📦 Extracting..."
 unzip -o "/tmp/$FILE" -d /tmp/
 
-BINARY="/tmp/${APP_NAME}-${OS}-${ARCH}"
+BINARY="/tmp/$BIN_NAME"
+
+if [ ! -f "$BINARY" ]; then
+    echo "❌ Binary not found after extraction: $BINARY"
+    exit 1
+fi
+
 echo "🚚 Installing to $INSTALL_DIR/$APP_NAME"
 sudo mv "$BINARY" "$INSTALL_DIR/$APP_NAME"
 sudo chmod +x "$INSTALL_DIR/$APP_NAME"
