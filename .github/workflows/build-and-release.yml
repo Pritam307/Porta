@@ -76,7 +76,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
 
       - name: Upload linux x64
         uses: actions/upload-release-asset@v1
