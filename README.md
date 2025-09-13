@@ -70,15 +70,23 @@ porta -l <local-port>
 ### Examples
 
 ```bash
-# Expose local port 3000 to remote port 9091
+# Expose local port 3000 with auto-assigned remote port
 porta -l 3000
 
-# Expose local port 8080 to remote port 9091
+# Expose local port 8080 with auto-assigned remote port
 porta -l 8080
 
-# Expose local port 5000 to remote port 9091
+# Expose local port 5000 with auto-assigned remote port
 porta -l 5000
 ```
+
+### How It Works
+
+Porta automatically:
+- Connects to the tunnel server at `tunnel.joinmyprojects.dpdns.org`
+- Assigns an available remote port (10000-10100 range)
+- Creates a secure SSH tunnel between your local port and the remote port
+- Provides a public URL for accessing your local service
 
 ## 📋 What Happens When You Run Porta
 
@@ -87,14 +95,15 @@ When you start Porta, you'll see output like this:
 ```
 🚀 Starting tunnel...
    Local:  http://localhost:3000
-   Remote: https://tunnel.joinmyprojects.dpdns.org
+   Remote port on server: https://10001.tunnel.joinmyprojects.dpdns.org
 ```
 
 ### What This Means
 
 - **Local URL**: Your service running on `localhost:3000` is now accessible
-- **Remote URL**: Anyone can access your local service via `https://tunnel.joinmyprojects.dpdns.org`
+- **Remote URL**: Anyone can access your local service via `https://10001.tunnel.joinmyprojects.dpdns.org` (port number will vary)
 - **Tunnel Status**: The connection stays active until you stop it (Ctrl+C)
+- **Port Management**: Porta automatically assigns an available port (10000-10100) and tracks it
 
 ### Stopping the Tunnel
 
@@ -107,43 +116,35 @@ Press `Ctrl+C` to gracefully close the tunnel:
 
 ## 🔧 Prerequisites
 
-- SSH access to your remote server
-- SSH key authentication (recommended) or password access
+- SSH access to the tunnel server
 - Your local service running on the specified port
-
-## 🛠️ Setup Your Remote Server
-
-Make sure your remote server allows SSH port forwarding:
-
-1. Edit `/etc/ssh/sshd_config` on your server
-2. Ensure these settings are enabled:
-   ```
-   GatewayPorts yes
-   AllowTcpForwarding yes
-   ```
-3. Restart SSH service: `sudo systemctl restart ssh`
+- No additional server setup required - Porta handles everything automatically!
 
 ## 🔍 Troubleshooting
 
 ### Common Issues
 
-**"Permission denied"**
-- Ensure SSH key is properly configured
-- Check if password authentication is enabled
+**"No available ports!"**
+- All ports in the 10000-10100 range are currently in use
+- Wait for other users to free up ports or try again later
 
 **"Connection refused"**
-- Verify your local service is running
+- Verify your local service is running on the specified port
 - Check if the local port is correct
 
+**"Permission denied"**
+- Ensure SSH key is properly configured for the tunnel server
+- Check if password authentication is enabled
+
 **"Port already in use"**
-- Choose a different remote port
-- Check if another tunnel is using the same port
+- Porta automatically manages port assignment, so this shouldn't happen
+- If it occurs, try running Porta again - it will find the next available port
 
 ### Debug Mode
 
-For verbose output, you can run SSH directly:
+For verbose SSH output, you can run SSH directly:
 ```bash
-ssh -N -R 9091:localhost:3000 ubuntu@tunnel.joinmyprojects.dpdns.org -v
+ssh -N -R 10001:localhost:3000 ubuntu@tunnel.joinmyprojects.dpdns.org -v
 ```
 
 ## 📄 License
